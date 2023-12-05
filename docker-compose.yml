@@ -68,6 +68,8 @@ services:
   postgres-dev:
     <<: *postgres
     profiles: ["dev", "all"]
+    ports:
+      - 127.0.0.1:5432:5432
     environment:
       POSTGRES_DB: 'dev'
       POSTGRES_USER: 'user'
