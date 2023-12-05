@@ -103,8 +103,8 @@ services:
     profiles: ["dev", "all"]
     environment:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      HASURA_GRAPHQL_DATABASE_URL: postgres://user:1234@postgres-test:5432/dev
-      PG_DATABASE_URL: postgres://user:1234@postgres-test:5432/dev
+      HASURA_GRAPHQL_DATABASE_URL: postgres://user:1234@postgres-dev:5432/dev
+      PG_DATABASE_URL: postgres://user:1234@postgres-dev:5432/dev
     depends_on:
       - postgres-dev
 
