@@ -68,13 +68,12 @@ services:
   postgres-dev:
     <<: *postgres
     profiles: ["dev", "all"]
+    ports:
+      - 127.0.0.1:5433:5432
     environment:
       POSTGRES_DB: 'dev'
       POSTGRES_USER: 'user'
       POSTGRES_PASSWORD: '1234'
-      PGDATA: '/var/lib/postgresql/data/pgdata'
-    volumes:
-      - postgresdb:/var/lib/postgresql/data
 
   pgadmin-test:
     <<: *pgadmin
@@ -103,8 +102,8 @@ services:
     profiles: ["dev", "all"]
     environment:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      HASURA_GRAPHQL_DATABASE_URL: postgres://user:1234@postgres-test:5432/dev
-      PG_DATABASE_URL: postgres://user:1234@postgres-test:5432/dev
+      HASURA_GRAPHQL_DATABASE_URL: postgres://user:1234@postgres-dev:5432/dev
+      PG_DATABASE_URL: postgres://user:1234@postgres-dev:5432/dev
     depends_on:
       - postgres-dev
 
