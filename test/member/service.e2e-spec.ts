@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 
 import { ApplicationModule } from '~/application.module';
 import { AppPlan } from '~/entity/AppPlan';
+import { MemberTask } from '~/entity/MemberTask';
 import { Category } from '~/definition/entity/category.entity';
 import { Property } from '~/definition/entity/property.entity';
 import { Tag } from '~/definition/entity/tag.entity';
@@ -29,6 +30,7 @@ describe('MemberService (e2e)', () => {
   let memberCategoryRepo: Repository<MemberCategory>;
   let memberPropertyRepo: Repository<MemberProperty>;
   let memberTagRepo: Repository<MemberTag>;
+  let memberTaskRepo: Repository<MemberTask>;
   let memberRepo: Repository<Member>;
   let appPlanRepo: Repository<AppPlan>;
   let appRepo: Repository<App>;
@@ -49,6 +51,7 @@ describe('MemberService (e2e)', () => {
     memberCategoryRepo = manager.getRepository(MemberCategory);
     memberPropertyRepo = manager.getRepository(MemberProperty);
     memberTagRepo = manager.getRepository(MemberTag);
+    memberTaskRepo = manager.getRepository(MemberTask);
     memberRepo = manager.getRepository(Member);
     appPlanRepo = manager.getRepository(AppPlan);
     appRepo = manager.getRepository(App);
@@ -60,6 +63,7 @@ describe('MemberService (e2e)', () => {
     await memberCategoryRepo.delete({});
     await memberPropertyRepo.delete({});
     await memberTagRepo.delete({});
+    await memberTaskRepo.delete({});
     await memberRepo.delete({});
     await appRepo.delete({});
     await appPlanRepo.delete({});
@@ -83,6 +87,7 @@ describe('MemberService (e2e)', () => {
     await memberCategoryRepo.delete({});
     await memberPropertyRepo.delete({});
     await memberTagRepo.delete({});
+    await memberTaskRepo.delete({});
     await memberRepo.delete({});
     await categoryRepo.delete({});
     await propertyRepo.delete({});
@@ -797,6 +802,46 @@ describe('MemberService (e2e)', () => {
         await testField('tags', 'blank', setBlank, toExpect, false),
           await testField('tags', 'undefined', setUndefined, toExpect, false);
       });
+    });
+  });
+
+  describe('Method getMemberTasks', () => {
+    it('Should get memberTasks with specified memberId', async () => {
+      const fakeMemberId = v4();
+      const existingMemberId = v4();
+      let insertedMember = new Member();
+      insertedMember.appId = app.id;
+      insertedMember.id = existingMemberId;
+      insertedMember.name = 'member_task_test';
+      insertedMember.username = 'acc_member_task_test';
+      insertedMember.email = `mail_member_task_test@example.com`;
+      insertedMember.role = 'general-member';
+      insertedMember.star = 0;
+      insertedMember.createdAt = new Date();
+      insertedMember.loginedAt = new Date();
+      insertedMember = await memberRepo.save(insertedMember);
+
+      const insertedMemberTask = new MemberTask();
+      insertedMemberTask.member = insertedMember;
+      insertedMemberTask.title = 'title';
+      insertedMemberTask.priority = 'high';
+      insertedMemberTask.status = 'pending';
+      await manager.save(insertedMemberTask);
+
+      const insertedMemberTask2 = new MemberTask();
+      insertedMemberTask2.member = insertedMember;
+      insertedMemberTask2.title = 'title_2';
+      insertedMemberTask2.priority = 'high';
+      insertedMemberTask2.status = 'pending';
+      await manager.save(insertedMemberTask2);
+
+      const fakeMemberTasks = await service.getMemberTasks(fakeMemberId);
+      expect(fakeMemberTasks.length).toBe(0);
+
+      const existingMemberTasks = await service.getMemberTasks(existingMemberId);
+      expect(existingMemberTasks.length).toBe(2);
+      expect(existingMemberTasks[0].memberId).toBe(existingMemberId);
+      expect(existingMemberTasks[1].memberId).toBe(existingMemberId);
     });
   });
 });
